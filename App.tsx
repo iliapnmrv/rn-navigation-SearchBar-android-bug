@@ -1,118 +1,107 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import React, {useLayoutEffect, useRef} from 'react';
+import {Alert, Button, StyleSheet, Text, View} from 'react-native';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {SearchBarProps} from 'react-native-screens';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+const Stack = createNativeStackNavigator();
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+function HomeScreen({navigation}: any) {
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerSearchBarOptions: {
+        autoCapitalize: 'none',
+        placement: 'stacked',
+        hideWhenScrolling: false,
+        shouldShowHintSearchIcon: false,
+        hideNavigationBar: true,
+        tintColor: 'blue',
+        textColor: 'black',
+        hintTextColor: 'black',
+        headerIconColor: 'black',
+      } as SearchBarProps,
+    });
+  }, [navigation]);
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+    <View style={styles.container}>
+      <Text>Home Screen</Text>
+      <Button title="Details" onPress={() => navigation.navigate('Details')} />
+      <Button
+        title="Details2"
+        onPress={() => navigation.navigate('Details2')}
+      />
+    </View>
+  );
+}
+
+function DetailScreen({navigation}: any) {
+  const bottomSheetRef = useRef<BottomSheet>(null);
+
+  return (
+    <BottomSheet
+      enableDynamicSizing
+      ref={bottomSheetRef}
+      enablePanDownToClose
+      onClose={navigation.goBack}>
+      <BottomSheetView style={styles.contentContainer}>
+        <Text>Details</Text>
+      </BottomSheetView>
+    </BottomSheet>
+  );
+}
+function Detail2Screen() {
+  return (
+    <View style={styles.container}>
+      <Text>Detail2Screen</Text>
     </View>
   );
 }
 
 function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <GestureHandlerRootView style={{flex: 1}}>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            options={{headerSearchBarOptions: {}}}
+            name="Home"
+            component={HomeScreen}
+          />
+          <Stack.Group
+            screenOptions={{
+              headerShown: false,
+              presentation: 'transparentModal',
+              animation: 'none',
+            }}>
+            <Stack.Screen name="Details" component={DetailScreen} />
+          </Stack.Group>
+
+          <Stack.Screen
+            options={{
+              presentation: 'modal',
+            }}
+            name="Details2"
+            component={Detail2Screen}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }
 
+export default App;
+
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
+  contentContainer: {
+    minHeight: 300,
+    alignItems: 'center',
   },
 });
-
-export default App;
